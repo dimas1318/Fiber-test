@@ -6,6 +6,11 @@ import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
+import org.openjdk.jmh.results.format.ResultFormatType;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import test.Test;
 
 import java.util.Arrays;
 import java.util.concurrent.Callable;
@@ -15,12 +20,14 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static benchmarks.core.StdoutLogger.log;
-import static benchmarks.core.ring.RingBenchmarkConfig.MESSAGE_PASSING_COUNT;
-import static benchmarks.core.ring.RingBenchmarkConfig.WORKER_COUNT;
+import static benchmarks.core.ring.RingBenchmarkConfig.*;
+import static org.openjdk.jmh.runner.Defaults.MEASUREMENT_ITERATIONS;
+import static org.openjdk.jmh.runner.Defaults.WARMUP_ITERATIONS;
 
 /**
  * Ring benchmark using Java {@link Thread}s.
  */
+@State(Scope.Benchmark)
 public class JavaThreadRingBenchmark implements RingBenchmark {
 
     static class Worker implements Runnable {
@@ -197,13 +204,30 @@ public class JavaThreadRingBenchmark implements RingBenchmark {
     private final Context context = new Context();
 
     @Override
-//    @TearDown
+    @TearDown
     public void close() throws Exception {
         context.close();
     }
 
     @Override
+    @Benchmark
     public int[] ringBenchmark() {
         return context.call();
+    }
+
+    public static void main(String[] args) throws Exception {
+        Options options = new OptionsBuilder()
+                .include(JavaThreadRingBenchmark.class.getName())
+                .warmupIterations(WARMUP_ITERATIONS)
+                .measurementIterations(MEASUREMENT_ITERATIONS)
+                .forks(1)
+                .threads(THREAD_COUNT)
+                .resultFormat(ResultFormatType.JSON)
+                .result("ThreadRealization" + THREAD_COUNT + "_W" + WARMUP_ITERATIONS + "_M" + MEASUREMENT_ITERATIONS + ".json")
+                .build();
+        new Runner(options).run();
+//        try (JavaThreadRingBenchmark benchmark = new JavaThreadRingBenchmark()) {
+//            benchmark.ringBenchmark();
+//        }
     }
 }

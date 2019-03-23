@@ -1,3 +1,4 @@
 JMH S 9 test.Test S 51 test.generated.Test_JavaThreadRingBenchmark_jmhTest S 23 JavaThreadRingBenchmark S 11 AverageTime E A 1 1 1 E E E E E E E E E E E E E E U 12 MILLISECONDS E E 
 JMH S 33 benchmarks.JavaFiberRingBenchmark S 65 benchmarks.generated.JavaFiberRingBenchmark_ringBenchmark_jmhTest S 13 ringBenchmark S 10 Throughput E A 1 1 1 E E E E E E E E E E E E E E E E E 
 JMH S 9 test.Test S 50 test.generated.Test_JavaFiberRingBenchmark_jmhTest S 22 JavaFiberRingBenchmark S 11 AverageTime E A 1 1 1 E E E E E E E E E E E E E E U 12 MILLISECONDS E E 
+JMH S 34 benchmarks.JavaThreadRingBenchmark S 66 benchmarks.generated.JavaThreadRingBenchmark_ringBenchmark_jmhTest S 13 ringBenchmark S 10 Throughput E A 1 1 1 E E E E E E E E E E E E E E E E E 

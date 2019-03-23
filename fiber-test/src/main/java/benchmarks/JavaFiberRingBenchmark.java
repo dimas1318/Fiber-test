@@ -6,18 +6,19 @@ import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
+import org.openjdk.jmh.results.format.ResultFormatType;
+import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.Arrays;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 import static benchmarks.core.StdoutLogger.log;
 import static benchmarks.core.ring.RingBenchmarkConfig.*;
+import static org.openjdk.jmh.runner.Defaults.MEASUREMENT_ITERATIONS;
+import static org.openjdk.jmh.runner.Defaults.WARMUP_ITERATIONS;
 
 @State(Scope.Benchmark)
 public class JavaFiberRingBenchmark implements RingBenchmark {
@@ -48,7 +49,8 @@ public class JavaFiberRingBenchmark implements RingBenchmark {
             }
 
             log("scheduling fibers (THREAD_COUNT=%d)", THREAD_COUNT);
-            this.executorService = Executors.newFixedThreadPool(THREAD_COUNT);
+//            this.executorService = Executors.newFixedThreadPool(THREAD_COUNT);
+            this.executorService = ForkJoinPool.commonPool();
             for (JavaThreadRingBenchmark.Worker worker : workers) {
                 Fiber.schedule(executorService, worker);
             }
@@ -112,20 +114,20 @@ public class JavaFiberRingBenchmark implements RingBenchmark {
         return context.call();
     }
 
-//    public static void main(String[] args) throws RunnerException {
-//        Options options = new OptionsBuilder()
-//                .include(JavaFiberRingBenchmark.class.getName())
-//                .warmupIterations(WARMUP_ITERATIONS)
-//                .measurementIterations(MEASUREMENT_ITERATIONS)
-//                .forks(1)
-//                .threads(THREAD_COUNT)
-//                .resultFormat(ResultFormatType.JSON)
-//                .result("Threads" + THREAD_COUNT + "_W" + WARMUP_ITERATIONS + "_M" + MEASUREMENT_ITERATIONS + "sleep.json")
-//                .build();
-//        new Runner(options).run();
-//
+    public static void main(String[] args) throws RunnerException {
+        Options options = new OptionsBuilder()
+                .include(JavaFiberRingBenchmark.class.getName())
+                .warmupIterations(WARMUP_ITERATIONS)
+                .measurementIterations(MEASUREMENT_ITERATIONS)
+                .forks(1)
+                .threads(THREAD_COUNT)
+                .resultFormat(ResultFormatType.JSON)
+                .result("FiberRealization" + THREAD_COUNT + "_W" + WARMUP_ITERATIONS + "_M" + MEASUREMENT_ITERATIONS + ".json")
+                .build();
+        new Runner(options).run();
+
 //        try (JavaFiberRingBenchmark benchmark = new JavaFiberRingBenchmark()) {
 //            benchmark.ringBenchmark();
 //        }
-//    }
+    }
 }
